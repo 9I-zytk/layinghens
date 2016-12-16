@@ -3,9 +3,11 @@ import VueRouter from 'vue-router'
 import App from './App'
 import routes from './routes'
 import ElementUI from 'element-ui'
+import vueResource from 'vue-resource'
 import 'element-ui/lib/theme-default/index.css'
 
 Vue.use(VueRouter)
+Vue.use(vueResource)
 Vue.use(ElementUI)
 /* or
 *Vue.component(Button.name, Button)

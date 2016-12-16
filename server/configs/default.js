@@ -25,9 +25,6 @@ let config = {
       pass:''
     }
   },
-  'jwt': {
-    'cert': 'layingHens'
-  },
   dir: { // 目录配置
     root,
     log: path.join(__dirname,'..', 'logs'),

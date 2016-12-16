@@ -13,7 +13,7 @@ const stageSchema=new Schema({
   stageName:String
 });
 
-const henTypeModel =  mongoose.model('henType', henTypeSchema);
+const henTypeModel =  mongoose.model('HenType', henTypeSchema);
 const stageModel =  mongoose.model('stage', stageSchema);
 
 const henTypeArray=[{
@@ -39,6 +39,8 @@ const stageArray=[{
 
 const henType = new henTypeModel(henTypeArray);
 const stage = new stageModel(stageArray);
+const model={};
+model.stage = stage;
+model.henType = henType;
+module.exports = model;
 
-module.exports.stage = stage;
-module.exports.henType = henType;

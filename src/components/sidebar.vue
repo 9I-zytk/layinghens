@@ -23,7 +23,7 @@
                   </li>
                 </ul>
                 <a class="btn-flat dropdown-button waves-effect waves-light white-text profile-btn" href="#" data-activates="profile-dropdown">John Doe<i class="mdi-navigation-arrow-drop-down right"></i></a>
-                <p class="user-roal">Administrator</p>
+                <p class="user-roal">Admin</p>
               </div>
             </div>
           </li>
@@ -35,7 +35,7 @@
                   <div class="collapsible-body">
                     <ul>
                       <li v-for='item in menu.items'>
-                        <router-link :to="{ name: item.herf }"><i class="mdi-image-lens"></i>{{item.name}}</router-link>
+                        <router-link :to="{ name: item.herf }">{{item.name}}</router-link>
                     </ul>
                   </div>
               </li>

@@ -14,7 +14,7 @@ const henInfoSchema=new Schema({
   },
   /* 类型 蛋鸡类型*/
   type:{
-    id: Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'henType'
   },
   /*批次开始时间*/
@@ -29,7 +29,7 @@ const henInfoSchema=new Schema({
   /*批次所处阶段
   * 育雏,开产,淘汰*/
   stage: {
-    id: Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'stage'
   },
   /*批次雏鸡总数*/
@@ -42,6 +42,13 @@ const henInfoSchema=new Schema({
     type:Number,
     required:true
   },
+  //创建人
+  createdBy: {
+    type: String,
+    required: true,
+    ref: 'User'
+  },
+
 });
 henInfoSchema.path('createTime').get(function (d) {
   return new Date(d).format('yyyy-MM-dd hh:mm:ss');

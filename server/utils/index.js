@@ -6,7 +6,7 @@ const Logger = require('mini-logger'),
   validator = require('validator'),
   config = require('../configs/default.js'),
   print = require('debug')('layingHens'),
-  utils = {}
+  utils = {};
 
 
 module.exports = utils;

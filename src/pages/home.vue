@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <div>
+      <span v-html="tableData.total"></span>
+      <button @click="getData()">点我</button>
+    </div>
     <el-table
       :data="tableData2"
       style="width: 100%"
@@ -24,6 +28,9 @@
 
 <script>
 export default {
+  ready: function () {
+    this.getData()
+  },
   methods: {
     tableRowClassName (row, index) {
       if (index === 1) {
@@ -32,6 +39,20 @@ export default {
         return 'positive-row'
       }
       return ''
+    },
+    getData () {
+      let vm = this
+      let uri = 'http://localhost:' + 8001 + vm.apiUrl
+      vm.$http.get(uri).then((response) => {
+        console.log(response)
+        if (response.success) vm.$set('tableData', response.data)
+      })
+      .catch((response) => {
+        console.log(response)
+      })
+    },
+    closeDialog () {
+      this.show = false
     }
   },
   data () {
@@ -52,7 +73,9 @@ export default {
         date: '2016-05-03',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄'
-      }]
+      }],
+      tableData: [],
+      apiUrl: '/api/henInfo'
     }
   }
 }

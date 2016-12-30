@@ -48,7 +48,7 @@ export async function createUser (ctx) {
   try {
     await user.save()
   } catch (err) {
-    ctx.throw(422, err.message)
+    ctx.error(err.message,422)
   }
 
   const token = user.generateToken()
@@ -56,10 +56,10 @@ export async function createUser (ctx) {
 
   delete response.password
 
-  ctx.body = {
+  ctx.success({
     user: response,
     token
-  }
+  },200)
 }
 
 /**
@@ -69,29 +69,10 @@ export async function createUser (ctx) {
  * @apiName GetUsers
  * @apiGroup Users
  *
- * @apiExample Example usage:
- * curl -H "Content-Type: application/json" -X GET localhost:5000/users
- *
- * @apiSuccess {Object[]} users           Array of user objects
- * @apiSuccess {ObjectId} users._id       User id
- * @apiSuccess {String}   users.name      User name
- * @apiSuccess {String}   users.username  User username
- *
- * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       "users": [{
- *          "_id": "56bd1da600a526986cf65c80"
- *          "name": "John Doe"
- *          "username": "johndoe"
- *       }]
- *     }
- *
- * @apiUse TokenError
  */
 export async function getUsers (ctx) {
   const users = await User.find({}, '-password')
-  ctx.body = { users }
+  ctx.success(users,200)
 }
 
 /**
@@ -101,25 +82,6 @@ export async function getUsers (ctx) {
  * @apiName GetUser
  * @apiGroup Users
  *
- * @apiExample Example usage:
- * curl -H "Content-Type: application/json" -X GET localhost:5000/users/56bd1da600a526986cf65c80
- *
- * @apiSuccess {Object}   users           User object
- * @apiSuccess {ObjectId} users._id       User id
- * @apiSuccess {String}   users.name      User name
- * @apiSuccess {String}   users.username  User username
- *
- * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       "user": {
- *          "_id": "56bd1da600a526986cf65c80"
- *          "name": "John Doe"
- *          "username": "johndoe"
- *       }
- *     }
- *
- * @apiUse TokenError
  */
 export async function getUser (ctx, next) {
   try {
@@ -127,16 +89,12 @@ export async function getUser (ctx, next) {
     if (!user) {
       ctx.throw(404)
     }
-
-    ctx.body = {
-      user
-    }
+    ctx.success(user,200)
   } catch (err) {
     if (err === 404 || err.name === 'CastError') {
-      ctx.throw(404)
+      ctx.error('未找到指定用户!',404)
     }
-
-    ctx.throw(500)
+    ctx.error('服务器遇到内部错误!',500)
   }
 
   if (next) { return next() }
@@ -149,38 +107,6 @@ export async function getUser (ctx, next) {
  * @apiName UpdateUser
  * @apiGroup Users
  *
- * @apiExample Example usage:
- * curl -H "Content-Type: application/json" -X PUT -d '{ "user": { "name": "Cool new Name" } }' localhost:5000/users/56bd1da600a526986cf65c80
- *
- * @apiParam {Object} user          User object (required)
- * @apiParam {String} user.name     Name.
- * @apiParam {String} user.username Username.
- *
- * @apiSuccess {Object}   users           User object
- * @apiSuccess {ObjectId} users._id       User id
- * @apiSuccess {String}   users.name      Updated name
- * @apiSuccess {String}   users.username  Updated username
- *
- * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       "user": {
- *          "_id": "56bd1da600a526986cf65c80"
- *          "name": "Cool new name"
- *          "username": "johndoe"
- *       }
- *     }
- *
- * @apiError UnprocessableEntity Missing required parameters
- *
- * @apiErrorExample {json} Error-Response:
- *     HTTP/1.1 422 Unprocessable Entity
- *     {
- *       "status": 422,
- *       "error": "Unprocessable Entity"
- *     }
- *
- * @apiUse TokenError
  */
 export async function updateUser (ctx) {
   const user = ctx.body.user
@@ -189,9 +115,7 @@ export async function updateUser (ctx) {
 
   await user.save()
 
-  ctx.body = {
-    user
-  }
+  ctx.success(user,200)
 }
 
 /**
@@ -200,19 +124,6 @@ export async function updateUser (ctx) {
  * @apiVersion 1.0.0
  * @apiName DeleteUser
  * @apiGroup Users
- *
- * @apiExample Example usage:
- * curl -H "Content-Type: application/json" -X DELETE localhost:5000/users/56bd1da600a526986cf65c80
- *
- * @apiSuccess {StatusCode} 200
- *
- * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       "success": true
- *     }
- *
- * @apiUse TokenError
  */
 
 export async function deleteUser (ctx) {
@@ -220,8 +131,7 @@ export async function deleteUser (ctx) {
 
   await user.remove()
 
-  ctx.status = 200
-  ctx.body = {
+  ctx.success({
     success: true
-  }
+  },200)
 }

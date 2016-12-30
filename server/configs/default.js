@@ -13,7 +13,7 @@ const path = require('path'),
 let config = {
   app: {
     name:'layingHens',
-    port: 8001,
+    port: 8002,
     apiPath: '/api' // 后台路径
   },
   debug:false,

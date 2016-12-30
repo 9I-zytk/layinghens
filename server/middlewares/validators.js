@@ -4,9 +4,8 @@
 import User from '../models/user'
 import config from '../../config'
 import getToken  from '../utils/auth'
-import { verify } from 'jsonwebtoken'
 
-export async function ensureUser (ctx, next) {
+module.exports= async (ctx, next)=>{
   const token = getToken(ctx)
 
   if (!token) {

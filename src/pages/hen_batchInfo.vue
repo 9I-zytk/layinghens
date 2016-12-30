@@ -3,15 +3,21 @@
     <div class="div-breadcrumb">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/info' }">批次信息</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <div>
-      <span v-html="tableData.total"></span>
-      <button @click="getData()">点我</button>
+    <div class="toolBar">
+      <el-button type="primary" icon="edit" @click="getData()"></el-button>
+      <el-button type="primary" icon="share"></el-button>
+      <el-button type="primary" icon="delete"></el-button>
+      <el-button type="primary" icon="search">搜索</el-button>
     </div>
-    <el-table
+    <div class="data-table">
+      <el-table
       :data="tableData"
+      border
       style="width: 100%"
+      highlight-current-row
       :row-class-name="tableRowClassName">
       <el-table-column
         prop="batchName"
@@ -54,6 +60,13 @@
         width="120">
       </el-table-column>
     </el-table>
+    </div>
+    <footer class="page-footer">
+      <el-button-group>
+        <el-button type="primary" icon="arrow-left">上一页</el-button>
+        <el-button type="primary">下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+      </el-button-group>
+    </footer>
   </div>
 </template>
 
@@ -76,7 +89,7 @@ export default {
       let uri = 'http://localhost:' + 8002 + vm.apiUrl
       vm.$http.get(uri).then((response) => {
         console.log(response)
-        if (response.success) vm.$set('tableData', response.body.henBatch)
+        if (response.ok) vm.tableData = response.body.henBatch
       })
       .catch((response) => {
         console.log(response)
@@ -119,5 +132,10 @@ export default {
 
   .el-table .positive-row {
     background: #e2f0e4;
+  }
+  .div-breadcrumb
+  {
+   height:45px;
+   padding:10px;
   }
 </style>

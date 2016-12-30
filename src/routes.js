@@ -3,6 +3,7 @@
  */
 import home from './pages/home.vue'
 import notFound from './pages/404.vue'
+import henBatchInfo from './pages/hen_batchInfo.vue'
 
 export default [{
   path: '/',
@@ -17,7 +18,7 @@ export default [{
 {
   path: '/info',
   name: 'info',
-  component: notFound
+  component: henBatchInfo
 },
 {
   path: '/vaccine',

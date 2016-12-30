@@ -42,13 +42,17 @@ const henInfoSchema=new Schema({
     type:Number,
     required:true
   },
+  /*批次疫损数*/
+  lossAmount:{
+    type:Number,
+    required:true
+  },
   //创建人
   createdBy: {
     type: String,
     required: true,
     ref: 'User'
-  },
-
+  }
 });
 henInfoSchema.path('createTime').get(function (d) {
   return new Date(d).format('yyyy-MM-dd hh:mm:ss');

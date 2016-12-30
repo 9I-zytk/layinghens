@@ -2,57 +2,71 @@
  * Created by 9i on 2016/12/15.
  */
 "use strict";
-const config = require('./configs/default');
+import Koa from 'koa'
+import bodyParser from 'koa-bodyparser'
+import convert from 'koa-convert'
+import logger from 'koa-logger'
+import mongoose from 'mongoose'
+import cors from 'koa-cors'
+import session from 'koa-generic-session'
+import responseMiddleware from './middlewares/return'
 
-const path = require('path'),
-  co = require('co'),
-  Koa = require('koa');
-const app =new Koa(),
-  convert=require('koa-convert'),
-  bodyParser = require('koa-bodyparser'),
-  cors = require('koa-cors'),
-  router = require('koa-router')({
-    prefix:config.app.apiPath
-  }),
-  onerror = require('koa-onerror'),
-  mongoose = require('mongoose'),
-  controllers = require('./controllers/index.js'),
-  utils =require('./utils/index.js');
-co(function*() {
-  mongoose.connect(config.mongoConfig.url,config.mongoConfig.opts);
+const router = require('koa-router')();
+const config = require('./configs/default'),
+     logUtil = require('./utils/index.js');
+
+  const app =new Koa()
+  mongoose.Promise = global.Promise
+  mongoose.connect(config.mongoConfig.url)
   /**
    * 将config注入中间件的ctx
    * */
   app.context.config = config;
+  //关键字
+  app.keys = ['keys', 'layingHen'];
+  // middleware
+  app.use(convert(cors()))
+     .use(bodyParser())
+     .use(convert(logger()))
+     // .use(convert(session()))
+     .use(responseMiddleware())
+  //routes
+  const api=require('./controllers/index')
+  router.get('/test',function (ctx, next) {
+    ctx.body = 'this a test response!';
+  });
+  router.use('/api',api.routes())
+  app.use(router.routes())
+     .use(router.allowedMethods());
+  // logger
+  app.use(async (ctx, next) => {
+    //响应开始时间
+    const start = new Date();
+    //响应间隔时间
+    let ms;
+    try {
+      //开始进入到下一个中间件
+      await next();
 
-  app.use(convert(cors({
-    maxAge: 7 * 24 * 60 * 60,
-    // 7 days 预请求头有效期
-    credentials: true,
-    methods: 'GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE',
-    headers: 'Content-Type, Accept, Authorization'
-  })))
+      ms = new Date() - start;
+      //记录响应日志
+      logUtil.logResponse(ctx, ms);
 
-  /**
-   * error信息优化
-   * */
-  onerror(app);
+    } catch (error) {
+
+      ms = new Date() - start;
+      //记录异常日志
+      logUtil.logError(ctx, error, ms);
+    }
+  });
+  //error
   app.on('error',(err,ctx)=>{
     if((ctx.status === 404 && err.status === undefined) || err.status === 500){
-      utils.logger.error('server error', err);
-      utils.logger.error(ctx);
+      logUtil.logError(ctx, err);
     }
-    utils.print(err);
+    console.log('error==>',err)
+    logUtil.logError(ctx, err);
   })
-
-  app.use(convert(bodyParser()));
-  yield controllers.init(router);
-  app.use(convert(router.routes()));
-
   app.listen(config.app.port, ()=>{
     console.log('app is listening on port '+config.app.port);
-    utils.print('app is listening on port '+config.app.port);
   })
-}).catch(function(err) {
-  utils.print(err.stack);
-});

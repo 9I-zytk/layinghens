@@ -58,9 +58,9 @@ export default {
         herf: 'home',
         iconClass: 'mdi-action-description',
         items: [{
-          name: '雏鸡信息',
+          name: '批次信息',
           description: '蛋鸡批次信息维护',
-          herf: '404',
+          herf: 'info',
           iconClass: 'fa-home'
         },
         {

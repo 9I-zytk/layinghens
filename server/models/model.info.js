@@ -42,6 +42,11 @@ const henInfoSchema=new Schema({
     type:Number,
     required:true
   },
+  /*批次雏蛋鸡总价*/
+  totalPrice:{
+    type:Number,
+    required:true
+  },
   /*批次疫损数*/
   lossAmount:{
     type:Number,

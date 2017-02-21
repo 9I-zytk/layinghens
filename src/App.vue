@@ -19,8 +19,8 @@
 import vHeader from './components/Hello'
 import sidebar from './components/sidebar'
 import loaderWrapper from './components/loader'
-import './assets/css/materialize.min.css'
-import './assets/css/style.min.css'
+import './assets/css/materialize.css'
+import './assets/css/style.css'
 import './assets/css/layout.css'
 
 export default {

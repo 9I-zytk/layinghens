@@ -6,7 +6,13 @@ const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 const henTypeSchema=new Schema({
   typeId:Number,
-  typeName:String
+  typeName:String,
+  /*供货商*/
+  Origin:String,
+  /*联系电话*/
+  phone:String,
+  /*联系人*/
+  Contacts:String
 });
 const stageSchema=new Schema({
   stageId:Number,
@@ -16,31 +22,8 @@ const stageSchema=new Schema({
 const henTypeModel =  mongoose.model('HenType', henTypeSchema);
 const stageModel =  mongoose.model('stage', stageSchema);
 
-const henTypeArray=[{
-  typeId:1,
-  typeName:'洋鸡'
-},
-{
-  typeId:2,
-  typeName:'土鸡'
-}];
-const stageArray=[{
-  typeId:1,
-  typeName:'育雏'
-},
-  {
-    typeId:2,
-    typeName:'开产'
-  },
-  {
-    typeId:3,
-    typeName:'淘汰'
-  }];
-
-const henType = new henTypeModel(henTypeArray);
-const stage = new stageModel(stageArray);
 const model={};
-model.stage = stage;
-model.henType = henType;
+model.stage = stageModel;
+model.henType = henTypeModel;
 module.exports = model;
 

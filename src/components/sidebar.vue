@@ -54,13 +54,19 @@ export default {
     return {
       select: {},
       menus: [{
-        name: '基础信息采集',
+        name: '基础信息',
         herf: 'home',
         iconClass: 'mdi-action-description',
         items: [{
           name: '批次信息',
           description: '蛋鸡批次信息维护',
           herf: 'info',
+          iconClass: 'fa-home'
+        },
+        {
+          name: '供应商管理',
+          description: '用于维护供应商和收购商',
+          herf: 'supplier',
           iconClass: 'fa-home'
         },
         {

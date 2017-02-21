@@ -5,6 +5,7 @@ import home from './pages/home.vue'
 import notFound from './pages/404.vue'
 import henBatchInfo from './pages/hen_batchInfo.vue'
 import vaccine from './pages/vaccine.vue'
+import supplier from './pages/supplier.vue'
 
 export default [{
   path: '/',
@@ -20,6 +21,11 @@ export default [{
   path: '/info',
   name: 'info',
   component: henBatchInfo
+},
+{
+  path: '/supplier',
+  name: 'supplier',
+  component: supplier
 },
 {
   path: '/vaccine',

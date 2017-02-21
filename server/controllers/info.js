@@ -2,10 +2,15 @@
  * Created by 9i on 2016/12/12.
  */
 "use strict"
+import user from '../models/user'
 const utils = require('../utils/index');
 const henInfo = require('../models/model.info.js');
 
-
+const Admin=[{
+  name: 'admin',
+  password: '888888',
+  state: 'active'
+  }];
 /**新增批次*
  * @api {post} /users Create a new batch
  * @apiPermission
@@ -26,15 +31,19 @@ const henInfo = require('../models/model.info.js');
  */
 
 export async function create (ctx) {
-  const henInfo = new henInfo(ctx.request.body.user)
-  if(henInfo.type === ''){
+  const HenInfo = new henInfo(ctx.request.body)
+  const userAdmin = new user(Admin)
+
+  if(HenInfo.type === ''){
     ctx.throw('类型不能为空!',400)
-  }else if(!henInfo.total&&!henInfo.henAmount){
+  }else if(!HenInfo.total&&!HenInfo.henAmount){
     ctx.throw('总数不能为0!',400)
   }
+  HenInfo.createdBy=userAdmin
+  const response = await HenInfo.save()
   ctx.status = 200
   ctx.body = {
-    data: henInfo.toJSON()
+    data: response
   }
 }
 /*查询所有批次信息*/
@@ -54,14 +63,17 @@ export async function henBatch(ctx,next) {
     skip = limit * (page - 1)
   }
   try {
-    const {henBatchArr, totalNumber} = await {
-      henBatchArr: henInfo.find()
+    const {henBatchArr, totalNumber} = {
+      henBatchArr: await henInfo.find({})
         .sort({createTime: -1})
-        .limit(limit).skip(skip).exec().catch(err => {
+        .limit(limit).skip(skip)
+        .populate('type')
+        .populate('stage')
+        .exec().catch(err => {
           utils.logger.error(err);
           ctx.throw(500, '内部错误')
         }),
-      totalNumber: henInfo.count().exec().catch(err => {
+      totalNumber: await henInfo.count().exec().catch(err => {
         utils.logger.error(err);
         ctx.throw(500, '内部错误')
       })
@@ -78,7 +90,7 @@ export async function henBatch(ctx,next) {
       henBatch: resultArr,
       total: totalNumber
     }
-    console.log('finish===>henBatch');
+    console.log('finish===>henBatch',totalNumber);
   }
   catch (err)
   {
@@ -101,7 +113,6 @@ export async function apiTest (ctx)  {
 }
 /*查询某一批次信息*/
 export async function henDetail(ctx,next) {
-  console.log(ctx);
   const id = ctx.params.id;
   try {
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -149,14 +160,14 @@ export async function henDetail(ctx,next) {
 }
 /*修改批次信息*/
 export async function modify(ctx,next){
-  const id = ctx.params.id;
+  const id = ctx.request.body.id;
+  delete ctx.request.body.id;
   try {
-    let henBatch = await henInfo.findByIdAndUpdate(id, {$set: this.request.body}, {new: true}).exec();
+    let henBatch = await henInfo.findByIdAndUpdate(id, {$set: ctx.request.body}, {new: true}).exec();
     if(!henBatch)
     {
       ctx.throw(404)
     }
-    henBatch = henBatch.toObject();
     ctx.status = 200
     ctx.body = {
       data: henBatch,
@@ -167,7 +178,7 @@ export async function modify(ctx,next){
     if (err.name === 'CastError'|| err===404) {
       ctx.throw('id不存在',400)
     } else {
-      utils.logger.error(err);
+      console.log(err)
       ctx.throw('服务器内部错误!',500)
     }
   }

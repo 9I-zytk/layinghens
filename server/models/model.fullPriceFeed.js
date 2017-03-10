@@ -28,6 +28,10 @@ const fullPriceFeedSchema=new Schema({
     type: Schema.Types.ObjectId,
     ref: 'supplier'
   },
+  /*备注字段*/
+  Remark:String,
+  /*冗余字段*/
+  Redundancy:String
 });
 
 const fullPriceFeedModel =  mongoose.model('fullPriceFeed', fullPriceFeedSchema);

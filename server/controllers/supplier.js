@@ -4,7 +4,8 @@
 "use strict"
 import supplier from '../models/model.supplier'
 
-const supplierType=[
+/*交易类型*/
+const dealType=[
   {
     type:1,
     nature:0,
@@ -39,24 +40,37 @@ const supplierType=[
     type:0,
     nature:0,
     typeName:'其他'
-  },
+  }
 ]
 
 export async function getSupplier (ctx) {
   const type = ctx.params.type;
+  console.log(type);
   let query={};
   if(type) query={type: type};
   const Suppliers = await supplier.find(query).exec();
-  const total = await supplier.find({}).exec();
+  const total = await supplier.count().exec();
   ctx.status = 200;
   ctx.body = {
     data: Suppliers,
-    supplierType:supplierType,
+    dealType:dealType,
     total:total
   }
 }
+
+export async function getSuppliers (ctx) {
+  const Suppliers = await supplier.find({}).exec();
+  const total = await supplier.count().exec();
+  ctx.status = 200;
+  ctx.body = {
+    data: Suppliers,
+    dealType:dealType,
+    total:total
+  }
+}
+
 export async function create (ctx) {
-  const Supplier = new supplier(ctx.request.body)
+  const Supplier = new supplier(ctx.request.body);
 
   if(Supplier.type === '') {
     ctx.throw('类型不能为空!', 400)

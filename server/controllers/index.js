@@ -33,6 +33,7 @@ router.get('/stage',async function (ctx) {
 const supplier_Router = Router();
 supplier_Router.post('/create',supplier.create);
 supplier_Router.get('/:type',supplier.getSupplier);
+supplier_Router.get('/',supplier.getSuppliers);
 supplier_Router.post('/modify',supplier.editSupplier);
 
 router.use('/supplier', supplier_Router.routes(), supplier_Router.allowedMethods());

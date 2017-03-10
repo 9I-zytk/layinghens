@@ -19,7 +19,7 @@ const vaccineSchema=new Schema({
     required:true
   },
   /*作用*/
-  remark:String,
+  effect:String,
   /*单价*/
   price:String,
   /*数量*/
@@ -35,6 +35,10 @@ const vaccineSchema=new Schema({
     type: Schema.Types.ObjectId,
     ref: 'supplier'
   },
+  /*备注字段*/
+  Remark:String,
+  /*冗余字段*/
+  Redundancy:String
 });
 
 const vaccineModel =  mongoose.model('vaccine', vaccineSchema);

@@ -6,6 +6,10 @@ import notFound from './pages/404.vue'
 import henBatchInfo from './pages/hen_batchInfo.vue'
 import vaccine from './pages/vaccine.vue'
 import supplier from './pages/supplier.vue'
+import daily from './pages/dailyInfo.vue'
+import mixedFeed from './pages/mixedFeed.vue'
+import fullPrice from './pages/fullprice.vue'
+import loss from './pages/loss.vue'
 
 export default [{
   path: '/',
@@ -35,12 +39,12 @@ export default [{
 {
   path: '/fullPrice',
   name: 'fullPrice',
-  component: notFound
+  component: fullPrice
 },
 {
   path: '/mixedFeed',
   name: 'mixedFeed',
-  component: notFound
+  component: mixedFeed
 },
 {
   path: '/otherCost',
@@ -50,6 +54,16 @@ export default [{
 {
   path: '/costTotal',
   name: 'costTotal',
+  component: notFound
+},
+{
+  path: '/loss',
+  name: 'loss',
+  component: loss
+},
+{
+  path: '/eggSale',
+  name: 'eggSale',
   component: notFound
 },
 {
@@ -65,7 +79,7 @@ export default [{
 {
   path: '/dailyInfo',
   name: 'dailyInfo',
-  component: notFound
+  component: daily
 },
 {
   path: '/chickInfo',

@@ -83,11 +83,33 @@ export async function create (ctx) {
 }
 
 export async function editSupplier (ctx) {
-  const Supplier = new supplier(ctx.request.body);
   const id = ctx.request.body.id;
   delete ctx.request.body.id;
   try {
     const response = await supplier.findByIdAndUpdate(id, {$set: ctx.request.body}, {new: true}).exec();
+    if(!response)
+    {
+      ctx.throw('未找到该记录!',404)
+    }
+    ctx.status = 200;
+    ctx.body = {
+      data: response
+    }
+  }
+  catch (err)
+  {
+    if (err.name === 'CastError'|| err===404) {
+      ctx.throw('id不存在',400)
+    } else {
+      ctx.throw('服务器内部错误!',500)
+    }
+  }
+}
+
+export async function delSupplier(ctx) {
+  const id = ctx.request.body._id;
+  try {
+    const response = await supplier.remove({_id: id}).exec();
     if(!response)
     {
       ctx.throw('未找到该记录!',404)

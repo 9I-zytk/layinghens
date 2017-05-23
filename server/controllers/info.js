@@ -52,10 +52,9 @@ export async function henBatch(ctx,next) {
    * @param page 批次列表页码 从1开始
    * @param limit 分页数量
    * */
-  console.log('mod===>henBatch');
 
-  const limit = ~~ctx.query.limit || 10,
-    page = ~~ctx.query.page;
+  const limit = ~~ctx.query.limit || 20,
+    page = ~~ctx.query.page||1;
   let skip;
   if(page === 0){
     skip = 0

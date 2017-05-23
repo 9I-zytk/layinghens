@@ -14,13 +14,13 @@ const fullPriceFeedSchema=new Schema({
     required:true
   },
   /*数量*/
-  quantity:String,
+  quantity:Number,
   /*重量*/
-  weight:String,
+  weight:Number,
   /*单价*/
-  price:String,
+  price:Number,
   /*总金额*/
-  amount:String,
+  amount:Number,
   /*交易日期*/
   saleDate:String,
   /*供货商*/

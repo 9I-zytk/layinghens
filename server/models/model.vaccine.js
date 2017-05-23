@@ -1,7 +1,7 @@
 /**
  * Created by 9i on 2017/1/6.
  * vaccine 疫苗/药物
- * 注意记录疫苗 药物采购记录
+ * 主要记录疫苗 药物采购记录
  */
 "use strict"
 const mongoose = require('mongoose'),
@@ -21,11 +21,11 @@ const vaccineSchema=new Schema({
   /*作用*/
   effect:String,
   /*单价*/
-  price:String,
+  price:Number,
   /*数量*/
-  quantity:String,
+  quantity:Number,
   /*总金额*/
-  amount:String,
+  amount:Number,
   /*单位*/
   unit:String,
   /*交易日期*/

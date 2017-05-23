@@ -3,8 +3,8 @@
     <div class="div-breadcrumb">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item >疫苗</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/vaccine' }">疫苗信息</el-breadcrumb-item>
+        <el-breadcrumb-item >饲料管理</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/mixedFeed' }">混合料</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="tool-bar">
@@ -43,24 +43,11 @@
           min-width="100">
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
-              <p>类型: {{ scope.row.batchName.type }}</p>
+              <p>类型: {{ currentBatch.type.typeName }}</p>
               <p>蛋鸡数: {{ scope.row.batchName.henAmount }}</p>
               <p>疫损: {{ scope.row.batchName.lossAmount }}</p>
               <div slot="reference" class="name-wrapper">
                 <el-tag>{{ scope.row.batchName.batchName }}</el-tag>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="name"
-          label="药物名称"
-          min-width="150">
-          <template scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p>作用: {{ scope.row.effect }}</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag>{{ scope.row.name }}</el-tag>
               </div>
             </el-popover>
           </template>
@@ -80,14 +67,19 @@
           width="100">
         </el-table-column>
         <el-table-column
-          prop="unit"
-          label="单位"
-          width="75">
+          prop="typeName"
+          label="类别"
+          width="120">
+        </el-table-column>
+        <el-table-column
+          prop="weight"
+          label="规格(KG/袋)"
+          width="150">
         </el-table-column>
         <el-table-column
           prop="quantity"
-          label="数量"
-          width="75">
+          label="数量(袋)"
+          width="100">
         </el-table-column>
         <el-table-column
           prop="Origin.Origin"
@@ -129,14 +121,19 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-
-            <el-form-item label="名称" prop="name" required>
-              <el-input v-model="ruleForm.name"></el-input>
+            <el-form-item label="类型" prop="typeId">
+              <el-select v-model="ruleForm.typeId" placeholder="请选择饲料类型">
+                <el-option
+                  v-for="item in feedTypeList"
+                  :label="item.typeName"
+                  :value="item.typeId">
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="供应商" prop="Origin">
-              <el-select v-model="ruleForm.Origin" placeholder="请选择供应商" @change='OriginChange'>
+              <el-select v-model="ruleForm.Origin" placeholder="请选择供应商">
                 <el-option
                   v-for="item in supplierList"
                   :label="item.Origin"
@@ -147,28 +144,21 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
-            <el-form-item label="作用" prop="effect" required>
-              <el-input v-model="ruleForm.effect"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
             <el-form-item label="数量" prop="quantity" required>
               <el-input-number v-model="ruleForm.quantity" :min="0" :max="100000"></el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="单位" prop="unit">
-              <el-input v-model="ruleForm.unit"></el-input>
+            <el-form-item label="重量" prop="weight">
+              <el-input-number v-model="ruleForm.weight" :min="0" :max="100000" :controls='false'></el-input-number>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="单价" prop="price" required>
-              <el-input-number v-model="ruleForm.price" :min="0" :max="100000"></el-input-number>
+              <el-input-number v-model="ruleForm.price" :min="0" :max="100000" :controls='false'></el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -196,8 +186,8 @@
   import moment from 'moment'
   export default {
     mounted: function () {
-      this.getRecord()
       this.getBatch()
+      this.getRecord()
       this.getSupplier()
     },
     methods: {
@@ -212,15 +202,16 @@
       optNew () {
         this.dialogFormVisible = true
         this.opt = 'new'
-        this.title = '疫苗--新增'
+        this.title = '全价料--新增'
+        this.ruleForm.batchName = this.currentBatch._id
         this.ruleForm = {
           batchName: this.currentBatch._id,
           saleDate: new Date(),
-          name: '',
+          typeId: 1,
+          typeName: '玉米',
           price: 0.00,
-          effect: '',
           quantity: 0,
-          unit: '',
+          weight: 0,
           amount: 0.00,
           Origin: '',
           Remark: ''
@@ -237,25 +228,11 @@
         }
         const beginDate = moment(start, 'yyyy-MM-dd')
         const endDate = moment(end, 'yyyy-MM-dd')
-        console.log(beginDate._i, endDate._i)
         uri = uri + vm.pageNo + '/' + vm.pageSize + '/' + beginDate._i + '/' + endDate._i
         vm.$http.get(uri).then((response) => {
           if (response.ok) {
             vm.tableData = response.body.data
-            vm.total = response.body.total
-          }
-        })
-          .catch((response) => {
-            console.log(response)
-          })
-      },
-      getRecordAll () {
-        let vm = this
-        let uri = vm.apiUrl
-        uri = uri + 'all'
-        vm.$http.get(uri).then((response) => {
-          if (response.ok) {
-            vm.tableData = response.body.data
+            vm.feedTypeList = response.body.feedType
             vm.total = response.body.total
           }
         })
@@ -295,6 +272,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             vm.ruleForm.saleDate = moment(vm.ruleForm.saleDate).format('YYYY-MM-DD')
+            vm.ruleForm.typeName = vm.getTypeName(vm.ruleForm.typeId)
             const promise = vm.$http.post(uri, vm.ruleForm)
             promise.then((response) => {
               if (response.ok) {
@@ -312,6 +290,12 @@
           }
         })
       },
+      getTypeName (index) {
+        const vm = this
+        for (let i in vm.feedTypeList) {
+          if (vm.feedTypeList[i].typeId === index) return vm.feedTypeList[i].typeName
+        }
+      },
       handleEdit (index, row) {
         this.dialogFormVisible = true
         this.opt = 'edit'
@@ -319,23 +303,19 @@
           id: row._id,
           batchName: row.batchName._id,
           saleDate: new Date(row.saleDate),
-          name: row.name,
           price: row.price,
-          effect: row.effect,
           quantity: row.quantity,
-          unit: row.unit,
+          weight: row.weight,
           amount: row.amount,
           Origin: row.Origin._id,
           Remark: row.Remark
         }
-        this.title = '疫苗记录--修改'
+        this.ruleForm.typeId = row.typeId
+        this.ruleForm.typeName = row.typeName
+        this.title = '混合料--修改'
       },
       formatDate (value) {
-        const date = moment(value).format('YYYY-MM-DD')
-        return date
-      },
-      OriginChange (value) {
-        console.log(typeof value)
+        return moment(value).format('YYYY-MM-DD')
       },
       handleSizeChange (val) {
         console.log(`每页 ${val} 条`)
@@ -358,18 +338,20 @@
         pageSize: 25,
         batchs: [],
         total: 0,
+        feedTypeList: [],
         supplierList: [],
         currentBatch: {},
-        title: '疫苗--新增',
+        title: '混合料--新增',
         dialogFormVisible: false,
         queryDate: [],
         ruleForm: {
           batchName: '',
           saleDate: new Date(),
-          name: '',
+          typeId: 1,
+          typeName: '玉米',
           price: 0.00,
           quantity: 0,
-          unit: '',
+          weight: 0,
           amount: 0.00,
           Origin: '',
           Remark: ''
@@ -378,14 +360,23 @@
           saleDate: [
             { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
+          typeId: [
+            { type: 'number', required: true, message: '请选择饲料类型', trigger: 'change' }
+          ],
           Origin: [
             { type: 'string', required: true, message: '请选择供应商', trigger: 'change' }
+          ],
+          quantity: [
+            { type: 'number', required: true, message: '请填写购买包数', trigger: 'change' }
+          ],
+          weight: [
+            { type: 'number', required: true, message: '请填写重量', trigger: 'change' }
           ],
           amount: [
             { type: 'number', required: true, message: '请填写总金额', trigger: 'change' }
           ]
         },
-        apiUrl: '/api/vaccine/',
+        apiUrl: '/api/mixedFeed/',
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',

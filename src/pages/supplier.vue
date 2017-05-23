@@ -38,7 +38,7 @@
       <el-table-column
         prop="Origin"
         label="单位名称"
-        width="150">
+        min-width="150">
       </el-table-column>
       <el-table-column
         prop="Contacts"
@@ -53,7 +53,7 @@
       <el-table-column
         prop="nature"
         label="性质"
-        width="80">
+        width="75">
         <template scope="scope">
           <el-tag
             :type="scope.row.nature === 0 ? 'primary' : 'success'"
@@ -63,12 +63,12 @@
       <el-table-column
         prop="Address"
         label="地址"
-        width="200">
+        min-width="150">
       </el-table-column>
       <el-table-column
         prop="Remark"
         label="备注"
-        width="200">
+        min-width="150">
       </el-table-column>
     </el-table>
     </div>
@@ -129,7 +129,6 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
       </div>
     </el-dialog>
   </div>
@@ -159,7 +158,6 @@ export default {
       let vm = this
       let uri = 'http://localhost:' + 8002 + vm.apiUrl
       vm.$http.get(uri).then((response) => {
-        console.log(response)
         if (response.ok) vm.tableData = response.body.data
       })
       .catch((response) => {
@@ -203,10 +201,30 @@ export default {
         Remark: row.Remark,
         tag: row.tag
       }
-      this.title = '雏鸡批次维护--修改'
+      this.title = '供应商维护--修改'
     },
     handleDelete (index, row) {
-
+      this.$confirm('此操作将永久删除该供应商, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let vm = this
+        let uri = vm.apiUrl + 'del'
+        const promise = vm.$http.post(uri, row)
+        promise.then((response) => {
+          console.log(response)
+          if (response.ok) {
+            this.$message({type: 'success', message: '删除成功!'})
+            vm.getSupplier()
+          }
+        })
+        .catch((response) => {
+          this.$message({showClose: true, message: '操作失败:' + response.statusText, type: 'error'})
+        })
+      }).catch(() => {
+        this.$message({type: 'info', message: '已取消删除'})
+      })
     },
     closeDialog () {
       this.show = false
@@ -229,11 +247,11 @@ export default {
       },
       natures: [
         {
-          value: '0',
+          value: 0,
           label: '供应商'
         },
         {
-          value: '1',
+          value: 1,
           label: '收购商'
         }],
       rules: {

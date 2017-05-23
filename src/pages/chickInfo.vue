@@ -3,8 +3,8 @@
     <div class="div-breadcrumb">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item >疫苗</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/vaccine' }">疫苗信息</el-breadcrumb-item>
+        <el-breadcrumb-item >蛋鸡管理</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/supplier' }">日产蛋信息</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="tool-bar">
@@ -15,9 +15,10 @@
         :picker-options="pickerOptions">
       </el-date-picker>
       <el-button-group>
-        <el-button type="primary" icon="search" @click="getRecord">查询</el-button>
-        <!--<el-button type="primary" icon="search" @click="getRecordAll">查询所有</el-button>-->
+        <el-button type="primary" icon="search" @click="getDaily">查询</el-button>
+        <!--<el-button type="primary" icon="search" @click="getDailyAll">查询所有</el-button>-->
         <el-button type="primary" icon="plus" @click="optNew">新增</el-button>
+        <el-button type="primary" icon="share">产蛋周报表</el-button>
       </el-button-group>
     </div>
     <div class="data-table">
@@ -27,10 +28,10 @@
         :row-class-name="tableRowClassName">
         <el-table-column
           type="index"
-          width="40">
+          width="50">
         </el-table-column>
         <el-table-column
-          label="操作" width="75">
+          label="操作" width="150">
           <template scope="scope">
             <el-button
               size="small"
@@ -40,7 +41,7 @@
         <el-table-column
           prop="batchName"
           label="批次"
-          min-width="100">
+          min-width="150">
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>类型: {{ scope.row.batchName.type }}</p>
@@ -53,46 +54,38 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="药物名称"
-          min-width="150">
-          <template scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p>作用: {{ scope.row.effect }}</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag>{{ scope.row.name }}</el-tag>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="saleDate"
-          label="交易日期"
+          prop="date"
+          label="日期"
           min-width="150">
           <template scope="scope">
             <el-icon name="time"></el-icon>
-            <span style="margin-left: 10px">{{formatDate(scope.row.saleDate)}}</span>
+            <span style="margin-left: 10px">{{formatDate(scope.row.date)}}</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="amount"
-          label="总金额"
+          prop="eggs"
+          label="产蛋数"
+          width="120">
+        </el-table-column>
+        <el-table-column
+          prop="layingRate"
+          label="产蛋率"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="unit"
-          label="单位"
-          width="75">
+          prop="remark"
+          label="评价"
+          width="100">
+          <template scope="scope">
+            <el-tag
+              :type="formatRate(scope.row.layingRate) <75? 'primary' : 'success'"
+              close-transition>{{formatRate(scope.row.layingRate) > 75 ? '合格':'不合格'}}</el-tag>
+          </template>
         </el-table-column>
         <el-table-column
-          prop="quantity"
-          label="数量"
-          width="75">
-        </el-table-column>
-        <el-table-column
-          prop="Origin.Origin"
-          label="供应商"
-          min-width="120">
+          prop="Remark"
+          label="备注"
+          min-width="200">
         </el-table-column>
       </el-table>
     </div>
@@ -122,58 +115,32 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="日期" prop="saleDate" required>
-              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.saleDate" style="width: 100%;"></el-date-picker>
+            <el-form-item label="日期" prop="date" required>
+              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date" style="width: 100%;"></el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-
-            <el-form-item label="名称" prop="name" required>
-              <el-input v-model="ruleForm.name"></el-input>
+            <el-form-item label="产蛋" prop="eggs" required>
+              <el-input-number v-model="ruleForm.eggs" :min="0" :max="100000" :disabled="true"></el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="供应商" prop="Origin">
-              <el-select v-model="ruleForm.Origin" placeholder="请选择供应商" @change='OriginChange'>
-                <el-option
-                  v-for="item in supplierList"
-                  :label="item.Origin"
-                  :value="item._id">
-                </el-option>
-              </el-select>
+            <el-form-item label="产蛋率" prop="layingRate">
+              <el-input v-model="ruleForm.layingRate" :disabled="true"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="作用" prop="effect" required>
-              <el-input v-model="ruleForm.effect"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="数量" prop="quantity" required>
-              <el-input-number v-model="ruleForm.quantity" :min="0" :max="100000"></el-input-number>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="单位" prop="unit">
-              <el-input v-model="ruleForm.unit"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="单价" prop="price" required>
-              <el-input-number v-model="ruleForm.price" :min="0" :max="100000"></el-input-number>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="总金额" prop="amount" required>
-              <el-input-number v-model="ruleForm.amount" :min="0" :max="100000"></el-input-number>
+            <el-form-item label="产蛋" prop="eggs" required>
+              <el-input-number v-model="eggNum.pieces" size="small" :min="0" :max="20" @change='piecesChange'></el-input-number>
+              <label class="text">件</label>
+              <el-input-number v-model="eggNum.tray" size="small" :min="0" :max="11" @change='trayChange'></el-input-number>
+              <label class="text">盘</label>
+              <el-input-number v-model="eggNum.piece" size="small" :min="0" :max="29" @change='pieceChange'></el-input-number>
+              <label class="text">个</label>
             </el-form-item>
           </el-col>
         </el-row>
@@ -196,9 +163,8 @@
   import moment from 'moment'
   export default {
     mounted: function () {
-      this.getRecord()
+      this.getDaily()
       this.getBatch()
-      this.getSupplier()
     },
     methods: {
       tableRowClassName (row, index) {
@@ -212,21 +178,12 @@
       optNew () {
         this.dialogFormVisible = true
         this.opt = 'new'
-        this.title = '疫苗--新增'
-        this.ruleForm = {
-          batchName: this.currentBatch._id,
-          saleDate: new Date(),
-          name: '',
-          price: 0.00,
-          effect: '',
-          quantity: 0,
-          unit: '',
-          amount: 0.00,
-          Origin: '',
-          Remark: ''
-        }
+        this.title = '日产蛋记录--新增'
       },
-      getRecord () {
+      formatRate (value) {
+        return Number(value.replace('%', ''))
+      },
+      getDaily () {
         let vm = this
         let uri = vm.apiUrl
         let end = moment().add('days', 1).format('YYYY-MM-DD')
@@ -238,7 +195,7 @@
         const beginDate = moment(start, 'yyyy-MM-dd')
         const endDate = moment(end, 'yyyy-MM-dd')
         console.log(beginDate._i, endDate._i)
-        uri = uri + vm.pageNo + '/' + vm.pageSize + '/' + beginDate._i + '/' + endDate._i
+        uri = uri + beginDate._i + '/' + endDate._i + '/' + vm.pageNo + '/' + vm.pageSize
         vm.$http.get(uri).then((response) => {
           if (response.ok) {
             vm.tableData = response.body.data
@@ -249,15 +206,12 @@
             console.log(response)
           })
       },
-      getRecordAll () {
+      getDailyAll () {
         let vm = this
         let uri = vm.apiUrl
         uri = uri + 'all'
         vm.$http.get(uri).then((response) => {
-          if (response.ok) {
-            vm.tableData = response.body.data
-            vm.total = response.body.total
-          }
+          if (response.ok) vm.tableData = response.body.data
         })
           .catch((response) => {
             console.log(response)
@@ -277,15 +231,29 @@
             console.log(response)
           })
       },
-      getSupplier () {
+      piecesChange (value) {
+        const vm = this
+        vm.eggNum.pieces = value
+        vm.ruleForm.eggs = value * 360 + vm.eggNum.tray * 30 + vm.eggNum.piece
+        vm.countRate()
+      },
+      trayChange (value) {
+        const vm = this
+        vm.eggNum.tray = value
+        vm.ruleForm.eggs = vm.eggNum.pieces * 360 + value * 30 + vm.eggNum.piece
+        vm.countRate()
+      },
+      pieceChange (value) {
+        const vm = this
+        vm.eggNum.piece = value
+        vm.ruleForm.eggs = vm.eggNum.pieces * 360 + vm.eggNum.tray * 30 + value
+        vm.countRate()
+      },
+      countRate () {
         let vm = this
-        let uri = '/api/supplier/'
-        vm.$http.get(uri).then((response) => {
-          if (response.ok) vm.supplierList = response.body.data
-        })
-          .catch((response) => {
-            console.log(response)
-          })
+        let count = vm.currentBatch.henAmount - vm.currentBatch.lossAmount
+        let rate = vm.ruleForm.eggs * 100 / count
+        vm.ruleForm.layingRate = rate.toFixed(2) + '%'
       },
       submitForm (formName) {
         let vm = this
@@ -294,12 +262,12 @@
         let uri = vm.apiUrl + url
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            vm.ruleForm.saleDate = moment(vm.ruleForm.saleDate).format('YYYY-MM-DD')
+            vm.ruleForm.date = moment(vm.ruleForm.date).format('YYYY-MM-DD')
             const promise = vm.$http.post(uri, vm.ruleForm)
             promise.then((response) => {
               if (response.ok) {
                 this.$message({showClose: true, message: '操作成功:' + response.statusText, type: 'success'})
-                vm.getRecord()
+                vm.getDaily()
               }
             })
               .catch((response) => {
@@ -317,34 +285,32 @@
         this.opt = 'edit'
         this.ruleForm = {
           id: row._id,
-          batchName: row.batchName._id,
-          saleDate: new Date(row.saleDate),
-          name: row.name,
-          price: row.price,
-          effect: row.effect,
-          quantity: row.quantity,
-          unit: row.unit,
-          amount: row.amount,
-          Origin: row.Origin._id,
+          batchName: row.batchName,
+          date: new Date(row.date),
+          eggs: row.eggs,
+          layingRate: row.layingRate,
           Remark: row.Remark
         }
-        this.title = '疫苗记录--修改'
+        this.setEggNum(row.eggs)
+        this.title = '日产蛋记录--修改'
+      },
+      setEggNum (eggs) {
+        this.eggNum.pieces = Math.floor(eggs / 360)
+        this.eggNum.tray = Math.floor((eggs - this.eggNum.pieces * 360) / 30)
+        this.eggNum.piece = eggs - this.eggNum.pieces * 360 - this.eggNum.tray * 30
       },
       formatDate (value) {
         const date = moment(value).format('YYYY-MM-DD')
         return date
       },
-      OriginChange (value) {
-        console.log(typeof value)
-      },
       handleSizeChange (val) {
         console.log(`每页 ${val} 条`)
         this.pageSize = val
-        this.getRecord()
+        this.getDaily()
       },
       handleCurrentChange (val) {
         this.pageNo = val
-        this.getRecord()
+        this.getDaily()
         console.log(`当前页: ${val}`)
       },
       closeDialog () {
@@ -358,34 +324,31 @@
         pageSize: 25,
         batchs: [],
         total: 0,
-        supplierList: [],
         currentBatch: {},
-        title: '疫苗--新增',
+        title: '日产蛋--新增',
         dialogFormVisible: false,
+        eggNum: {
+          pieces: 0,
+          tray: 0,
+          piece: 0
+        },
         queryDate: [],
         ruleForm: {
           batchName: '',
-          saleDate: new Date(),
-          name: '',
-          price: 0.00,
-          quantity: 0,
-          unit: '',
-          amount: 0.00,
-          Origin: '',
+          date: new Date(),
+          eggs: 0,
+          layingRate: 0,
           Remark: ''
         },
         rules: {
-          saleDate: [
+          date: [
             { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
-          Origin: [
-            { type: 'string', required: true, message: '请选择供应商', trigger: 'change' }
-          ],
-          amount: [
-            { type: 'number', required: true, message: '请填写总金额', trigger: 'change' }
+          eggs: [
+            { type: 'number', required: true, message: '请填写产蛋总数', trigger: 'blur' }
           ]
         },
-        apiUrl: '/api/vaccine/',
+        apiUrl: '/api/daily/',
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -417,3 +380,22 @@
     }
   }
 </script>
+<style lang="css">
+  label.text{
+    display: inline-block;
+    text-align: left;
+    vertical-align:middle;
+    font-size: 14px;
+    color: #5e6d82;
+    line-height: 1;
+    padding: 11px 5px 11px 5PX;
+    box-sizing: border-box;
+    margin-top: -20px;
+  }
+  .b-pagination
+  {
+    margin-top: 15px;
+    padding-right: 25px;
+    float: right;
+  }
+</style>

@@ -229,7 +229,7 @@
   </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 export default {
   mounted: function () {
     this.getData()
@@ -249,7 +249,6 @@ export default {
       let vm = this
       let uri = 'http://localhost:' + 8002 + vm.apiUrl + 'info/'
       vm.$http.get(uri).then((response) => {
-        console.log(response)
         if (response.ok) {
           vm.tableData = response.body.henBatch
           vm.total = response.body.total
@@ -300,7 +299,6 @@ export default {
         createdBy: ''
       }
       this.title = '雏鸡批次维护--修改'
-      console.log(this.ruleForm, row)
     },
     handleDelete (index, row) {
       this.dialogFinish = true
@@ -320,7 +318,6 @@ export default {
         sellTotalPrice: 0,
         sellTotalWeight: 0
       }
-      console.log(index, row)
     },
     optNew () {
       this.dialogFormVisible = true
@@ -357,7 +354,7 @@ export default {
       let uri = 'http://localhost:' + 8002 + vm.apiUrl + 'info/modify'
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          var promise = vm.$http.post(uri, vm.finishForm)
+          const promise = vm.$http.post(uri, vm.finishForm)
           promise.then((response) => {
             if (response.ok) {
               this.$message({showClose: true, message: '操作成功:' + response.statusText, type: 'success'})

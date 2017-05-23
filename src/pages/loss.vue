@@ -3,8 +3,8 @@
     <div class="div-breadcrumb">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item >疫苗</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/vaccine' }">疫苗信息</el-breadcrumb-item>
+        <el-breadcrumb-item >蛋鸡管理</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/loss' }">疫损信息</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="tool-bar">
@@ -16,8 +16,9 @@
       </el-date-picker>
       <el-button-group>
         <el-button type="primary" icon="search" @click="getRecord">查询</el-button>
-        <!--<el-button type="primary" icon="search" @click="getRecordAll">查询所有</el-button>-->
+        <!--<el-button type="primary" icon="search" @click="getDailyAll">查询所有</el-button>-->
         <el-button type="primary" icon="plus" @click="optNew">新增</el-button>
+        <el-button type="primary" icon="share">疫损情况一览表</el-button>
       </el-button-group>
     </div>
     <div class="data-table">
@@ -27,10 +28,10 @@
         :row-class-name="tableRowClassName">
         <el-table-column
           type="index"
-          width="40">
+          width="50">
         </el-table-column>
         <el-table-column
-          label="操作" width="75">
+          label="操作" width="150">
           <template scope="scope">
             <el-button
               size="small"
@@ -40,7 +41,7 @@
         <el-table-column
           prop="batchName"
           label="批次"
-          min-width="100">
+          min-width="150">
           <template scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>类型: {{ scope.row.batchName.type }}</p>
@@ -53,46 +54,28 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="药物名称"
-          min-width="150">
-          <template scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p>作用: {{ scope.row.effect }}</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag>{{ scope.row.name }}</el-tag>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="saleDate"
-          label="交易日期"
+          prop="date"
+          label="日期"
           min-width="150">
           <template scope="scope">
             <el-icon name="time"></el-icon>
-            <span style="margin-left: 10px">{{formatDate(scope.row.saleDate)}}</span>
+            <span style="margin-left: 10px">{{formatDate(scope.row.date)}}</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="amount"
-          label="总金额"
-          width="100">
-        </el-table-column>
-        <el-table-column
-          prop="unit"
-          label="单位"
-          width="75">
-        </el-table-column>
-        <el-table-column
           prop="quantity"
-          label="数量"
-          width="75">
+          label="疫损数"
+          width="120">
         </el-table-column>
         <el-table-column
-          prop="Origin.Origin"
-          label="供应商"
-          min-width="120">
+          prop="reason"
+          label="原因"
+          min-width="150">
+        </el-table-column>
+        <el-table-column
+          prop="Remark"
+          label="备注"
+          min-width="150">
         </el-table-column>
       </el-table>
     </div>
@@ -122,65 +105,27 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="日期" prop="saleDate" required>
-              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.saleDate" style="width: 100%;"></el-date-picker>
+            <el-form-item label="日期" prop="date" required>
+              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date" style="width: 100%;"></el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-
-            <el-form-item label="名称" prop="name" required>
-              <el-input v-model="ruleForm.name"></el-input>
+            <el-form-item label="原因" prop="reason" required>
+              <el-input v-model="ruleForm.reason" placeholder="简短输入疫损原因"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="供应商" prop="Origin">
-              <el-select v-model="ruleForm.Origin" placeholder="请选择供应商" @change='OriginChange'>
-                <el-option
-                  v-for="item in supplierList"
-                  :label="item.Origin"
-                  :value="item._id">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="作用" prop="effect" required>
-              <el-input v-model="ruleForm.effect"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="数量" prop="quantity" required>
-              <el-input-number v-model="ruleForm.quantity" :min="0" :max="100000"></el-input-number>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="单位" prop="unit">
-              <el-input v-model="ruleForm.unit"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="单价" prop="price" required>
-              <el-input-number v-model="ruleForm.price" :min="0" :max="100000"></el-input-number>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="总金额" prop="amount" required>
-              <el-input-number v-model="ruleForm.amount" :min="0" :max="100000"></el-input-number>
+            <el-form-item label="疫损数" prop="quantity" required>
+              <el-input-number v-model="ruleForm.quantity" :min="0" :max="100000" :controls="false"></el-input-number>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form-item label="备注" prop="Remark">
-              <el-input v-model="ruleForm.Remark"></el-input>
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model="ruleForm.Remark" placeholder="简短输入疫损详细"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -198,7 +143,6 @@
     mounted: function () {
       this.getRecord()
       this.getBatch()
-      this.getSupplier()
     },
     methods: {
       tableRowClassName (row, index) {
@@ -212,19 +156,7 @@
       optNew () {
         this.dialogFormVisible = true
         this.opt = 'new'
-        this.title = '疫苗--新增'
-        this.ruleForm = {
-          batchName: this.currentBatch._id,
-          saleDate: new Date(),
-          name: '',
-          price: 0.00,
-          effect: '',
-          quantity: 0,
-          unit: '',
-          amount: 0.00,
-          Origin: '',
-          Remark: ''
-        }
+        this.title = '疫损--新增'
       },
       getRecord () {
         let vm = this
@@ -237,22 +169,7 @@
         }
         const beginDate = moment(start, 'yyyy-MM-dd')
         const endDate = moment(end, 'yyyy-MM-dd')
-        console.log(beginDate._i, endDate._i)
         uri = uri + vm.pageNo + '/' + vm.pageSize + '/' + beginDate._i + '/' + endDate._i
-        vm.$http.get(uri).then((response) => {
-          if (response.ok) {
-            vm.tableData = response.body.data
-            vm.total = response.body.total
-          }
-        })
-          .catch((response) => {
-            console.log(response)
-          })
-      },
-      getRecordAll () {
-        let vm = this
-        let uri = vm.apiUrl
-        uri = uri + 'all'
         vm.$http.get(uri).then((response) => {
           if (response.ok) {
             vm.tableData = response.body.data
@@ -277,16 +194,6 @@
             console.log(response)
           })
       },
-      getSupplier () {
-        let vm = this
-        let uri = '/api/supplier/'
-        vm.$http.get(uri).then((response) => {
-          if (response.ok) vm.supplierList = response.body.data
-        })
-          .catch((response) => {
-            console.log(response)
-          })
-      },
       submitForm (formName) {
         let vm = this
         let url = 'create'
@@ -294,9 +201,10 @@
         let uri = vm.apiUrl + url
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            vm.ruleForm.saleDate = moment(vm.ruleForm.saleDate).format('YYYY-MM-DD')
+            vm.ruleForm.date = moment(vm.ruleForm.date).format('YYYY-MM-DD')
             const promise = vm.$http.post(uri, vm.ruleForm)
             promise.then((response) => {
+              console.log(response)
               if (response.ok) {
                 this.$message({showClose: true, message: '操作成功:' + response.statusText, type: 'success'})
                 vm.getRecord()
@@ -317,25 +225,18 @@
         this.opt = 'edit'
         this.ruleForm = {
           id: row._id,
-          batchName: row.batchName._id,
-          saleDate: new Date(row.saleDate),
-          name: row.name,
-          price: row.price,
-          effect: row.effect,
+          batchName: row.batchName,
+          date: new Date(row.date),
           quantity: row.quantity,
-          unit: row.unit,
-          amount: row.amount,
-          Origin: row.Origin._id,
+          reason: row.reason,
+          original: row.quantity,
           Remark: row.Remark
         }
-        this.title = '疫苗记录--修改'
+        this.title = '日产蛋记录--修改'
       },
       formatDate (value) {
         const date = moment(value).format('YYYY-MM-DD')
         return date
-      },
-      OriginChange (value) {
-        console.log(typeof value)
       },
       handleSizeChange (val) {
         console.log(`每页 ${val} 条`)
@@ -358,34 +259,29 @@
         pageSize: 25,
         batchs: [],
         total: 0,
-        supplierList: [],
         currentBatch: {},
-        title: '疫苗--新增',
+        title: '疫损--新增',
         dialogFormVisible: false,
         queryDate: [],
         ruleForm: {
           batchName: '',
-          saleDate: new Date(),
-          name: '',
-          price: 0.00,
+          date: new Date(),
           quantity: 0,
-          unit: '',
-          amount: 0.00,
-          Origin: '',
+          reason: '',
           Remark: ''
         },
         rules: {
-          saleDate: [
+          date: [
             { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
-          Origin: [
-            { type: 'string', required: true, message: '请选择供应商', trigger: 'change' }
+          quantity: [
+            { type: 'number', required: true, message: '请填写疫损数', trigger: 'blur' }
           ],
-          amount: [
-            { type: 'number', required: true, message: '请填写总金额', trigger: 'change' }
+          reason: [
+            { type: 'string', required: true, message: '请填写疫损原因', trigger: 'blur' }
           ]
         },
-        apiUrl: '/api/vaccine/',
+        apiUrl: '/api/loss/',
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',

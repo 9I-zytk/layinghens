@@ -1,7 +1,7 @@
 /**
  * Created by 9i on 2017/1/22.
  * mixedFeed 混合料
- * 注意记录砂石 玉米 预混料，豆柏采购记录
+ * 记录砂石 玉米 预混料，豆柏采购记录
  */
 "use strict"
 const mongoose = require('mongoose'),
@@ -15,7 +15,7 @@ const mixedFeedSchema=new Schema({
   },
   /*0-砂石 1-玉米 2-豆柏 3-预混料*/
   typeId:{
-    type:String,
+    type:Number,
     required:true
   },
   typeName:{
@@ -23,13 +23,13 @@ const mixedFeedSchema=new Schema({
     required:true
   },
   /*数量*/
-  quantity:String,
+  quantity:Number,
   /*重量*/
-  weight:String,
+  weight:Number,
   /*单价*/
-  price:String,
+  price:Number,
   /*总金额*/
-  amount:String,
+  amount:Number,
   /*交易日期*/
   saleDate:String,
   /*供货商*/
